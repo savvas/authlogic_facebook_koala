@@ -45,7 +45,7 @@ module AuthlogicFacebookKoala
         return(@facebook_session) 
       elsif cookies.has_key?("fbs_#{facebook_params.app_id}")
         oauth = Koala::Facebook::OAuth.new(facebook_params.app_id, facebook_params.secret_key)
-        @facebook_session = OpenStruct.new( oauth.get_user_from_cookie(cookies) )
+        @facebook_session = OpenStruct.new( oauth.get_user_info_from_cookie(cookies) )
       end
     end
       

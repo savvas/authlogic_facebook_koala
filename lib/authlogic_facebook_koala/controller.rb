@@ -11,7 +11,7 @@ module AuthlogicFacebookKoala
     def set_current_account_session_from_facebook_session
       unless current_account_session
         @current_account_session = AccountSession.new
-        @current_account_session.account = Account.find_by_facebook_uid(facebook_session.user.uid)
+        @current_account_session.account = Account.find_by_facebook_uid(facebook_session.uid)
       end
     end
   

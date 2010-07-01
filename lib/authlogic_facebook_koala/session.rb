@@ -62,7 +62,7 @@ module AuthlogicFacebookKoala
       #
       # * <tt>Default:</tt> false
       # * <tt>Accepts:</tt> Boolean
-      def facebook_auto_register(value=nil)
+      def facebook_auto_register(value=true)
         rw_config(:facebook_auto_register, value, false)
       end
       alias_method :facebook_auto_register=, :facebook_auto_register
@@ -94,16 +94,14 @@ module AuthlogicFacebookKoala
         puts "validating with facebook"
         facebook_uid = facebook_session.uid
         self.attempted_record = klass.send(facebook_finder, facebook_uid)
-
         if self.attempted_record || !facebook_auto_register?
           return @logged_in_with_facebook = !!self.attempted_record
         else
           self.attempted_record = klass.new
           self.attempted_record.send(:"#{facebook_uid_field}=", facebook_uid)
-          if self.attempted_record.respond_to?(:before_connect)
-            self.attempted_record.send(:before_connect, facebook_session)
+          if self.attempted_record.respond_to?(:before_connect, facebook_user)
+            self.attempted_record.send(:before_connect, facebook_user)
           end
-
           @logged_in_with_facebook = true
           return self.attempted_record.save(false)
         end

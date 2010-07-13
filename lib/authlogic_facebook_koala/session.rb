@@ -93,17 +93,27 @@ module AuthlogicFacebookKoala
       def validate_by_facebook
         puts "validating with facebook"
         facebook_uid = facebook_session.uid
+        facebook_email = facebook_user.email
         self.attempted_record = klass.send(facebook_finder, facebook_uid)
         if self.attempted_record || !facebook_auto_register?
           return @logged_in_with_facebook = !!self.attempted_record
         else
-          self.attempted_record = klass.new
-          self.attempted_record.send(:"#{facebook_uid_field}=", facebook_uid)
-          if self.attempted_record.respond_to?(:before_connect, facebook_user)
-            self.attempted_record.send(:before_connect, facebook_user)
+          self.attempted_record = klass.send('find_by_email', facebook_email)
+          if self.attempted_record
+            if self.attempted_record.respond_to?(:before_connect_update, facebook_user)
+              self.attempted_record.send(:before_connect_update, facebook_user)
+            end
+            @logged_in_with_facebook = true
+            return self.attempted_record.save(false)
+          else
+            self.attempted_record = klass.new
+            self.attempted_record.send(:"#{facebook_uid_field}=", facebook_uid)
+            if self.attempted_record.respond_to?(:before_connect, facebook_user)
+              self.attempted_record.send(:before_connect, facebook_user)
+            end
+            @logged_in_with_facebook = true
+            return self.attempted_record.save(false)
           end
-          @logged_in_with_facebook = true
-          return self.attempted_record.save(false)
         end
       end
 

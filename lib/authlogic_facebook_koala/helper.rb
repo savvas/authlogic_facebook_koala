@@ -5,8 +5,8 @@ module AuthlogicFacebookKoala
         callback = args.first
         options = args[1] || {}
         options.merge!(:onlogin=>callback) if callback
-        options.merge!(:perms=>"email,user_birthday,user_location", "show-faces" => "true", "max-row" => "2", "width" => "500")
-        text = ""
+        options.merge!(:perms=>"email,user_birthday,user_location", "show-faces" => "false", "width" => "500")
+        text = options[:text] || "Login"
 
         content_tag("fb:login-button",text, options)
       end

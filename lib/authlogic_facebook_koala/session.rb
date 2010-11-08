@@ -91,7 +91,7 @@ module AuthlogicFacebookKoala
       private
       
       def validate_by_facebook
-        Rails.logger.info "validating with facebook"
+        Rails.logger.info "\n>>>>>>>>>> validating with facebook"
         facebook_uid = facebook_session.uid
         facebook_email = facebook_user.email
         self.attempted_record = klass.send(facebook_finder, facebook_uid)
@@ -107,16 +107,16 @@ module AuthlogicFacebookKoala
               self.attempted_record.send(:before_connect_update, facebook_user)
             end
             @logged_in_with_facebook = true
-            return self.attempted_record.save(false)
+            return self.attempted_record.save
           else
-            Rails.logger.info "\n>>>>>> WOW this seems to be a new user (no email, no fb_uid). I'm going to ask for before_connect right now.\n"
+            Rails.logger.info "\n>>>>>>  This seems to be a new user (no email, no fb_uid detected). I'm going to ask for before_connect to add you in my database right now.\n"
             self.attempted_record = klass.new
             self.attempted_record.send(:"#{facebook_uid_field}=", facebook_uid)
             if self.attempted_record.respond_to?(:before_connect, facebook_user)
               self.attempted_record.send(:before_connect, facebook_user)
             end
             @logged_in_with_facebook = true
-            return self.attempted_record.save(false)
+            return self.attempted_record.save
           end
         end
       end
